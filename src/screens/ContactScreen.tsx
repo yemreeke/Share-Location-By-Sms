@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Button, PermissionsAndroid, Platform, StyleSheet, Text, View } from "react-native";
 import { Contact, selectContact } from "react-native-select-contact";
 
-const Home = () => {
+const ContactScreen = () => {
   const [selected, setSelected] = useState<Contact>();
   const selectPerson = async () => {
     if (await ContactPermission()) {
@@ -53,7 +53,6 @@ const Home = () => {
     </View>
   )
 }
-export default Home;
 
 const styles = StyleSheet.create({
   title: {
@@ -69,3 +68,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
   }
 })
+
+export default ContactScreen;
