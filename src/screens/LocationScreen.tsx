@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, Image, PermissionsAndroid, Platform, Button, TouchableOpacity, Linking, ScrollView, } from 'react-native';
+import { SafeAreaView, Text, Image, PermissionsAndroid, Platform, Linking } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
+import BottomBar from '../components/BottomBar';
+import CustomButton from '../components/CustomButton';
+import { useNavigation } from '@react-navigation/native';
+import { SCREENS } from '../navigation/navigation';
 
 const LocationScreen = () => {
-  const [currentLongitude, setCurrentLongitude] = useState('...');
-  const [currentLatitude, setCurrentLatitude] = useState('...');
-  const [locationStatus, setLocationStatus] = useState('');
+  const navigation = useNavigation();
+  const [currentLongitude, setCurrentLongitude] = useState("");
+  const [currentLatitude, setCurrentLatitude] = useState("");
+  const [locationStatus, setLocationStatus] = useState("");
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -38,13 +43,11 @@ const LocationScreen = () => {
     };
   }, []);
 
-
-
   const getOneTimeLocation = () => {
     setLocationStatus('Konum Algılanıyor...');
     Geolocation.getCurrentPosition(
       (position) => {
-        setLocationStatus('Konum Algılandı');
+        setLocationStatus('Konum Başarıyla Algılanmıştır');
         const currentLongitude = JSON.stringify(position.coords.longitude);
         const currentLatitude = JSON.stringify(position.coords.latitude);
         setCurrentLongitude(currentLongitude);
@@ -60,11 +63,10 @@ const LocationScreen = () => {
       },
     );
   };
-
   const subscribeLocationLocation = () => {
     watchID = Geolocation.watchPosition(
       (position) => {
-        setLocationStatus('Konum Algılandı');
+        setLocationStatus('Konum Başarıyla Algılanmıştır');
         console.log(position);
         const currentLongitude = JSON.stringify(position.coords.longitude);
         const currentLatitude = JSON.stringify(position.coords.latitude);
@@ -82,78 +84,31 @@ const LocationScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView>
-
-        <View style={styles.container}>
-          <View style={styles.container}>
-            <Image
-              source={{
-                uri:
-                  'https://raw.githubusercontent.com/AboutReact/sampleresource/master/location.png',
-              }}
-              style={{ width: 100, height: 100 }}
-            />
-            <Text style={styles.boldText}>
-              {locationStatus}
-            </Text>
-            <Text
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 16,
-              }}>
-              Longitude: {currentLongitude}
-            </Text>
-            <Text
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 16,
-              }}>
-              Latitude: {currentLatitude}
-            </Text>
-            <View style={{ marginTop: 20 }}>
-              <Button
-                title="Refresh"
-                onPress={getOneTimeLocation}
-              />
-            </View>
-          </View>
-
-          <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/place/' + currentLatitude + ',' + currentLongitude)}>
-            <Text style={{
-              borderWidth: 3,
-              borderColor: "blue",
-              borderRadius: 20,
-              padding: 20,
-              fontSize: 25,
-              color: 'red',
-              marginVertical: 16,
-              textAlign: 'center'
-            }}>Haritaya Git</Text>
-          </TouchableOpacity>
-
-        </View>
-      </ScrollView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white", alignItems: "center" }}>
+      <Image
+        source={require("../assets/img/location.png")}
+        style={{ marginTop: 20, width: 100, height: 100 }}
+      />
+      <Text style={{
+        fontSize: 25,
+        color: 'red',
+        marginVertical: 16,
+        textAlign: 'center'
+      }}>
+        {locationStatus}
+      </Text>
+      <CustomButton onPress={getOneTimeLocation} text="Yenile" width='40%' />
+      <CustomButton disable={locationStatus == "Konum Algılanıyor..."} onPress={() => {
+        if (Platform.OS == "ios") {
+          Linking.openURL('https://maps.apple.com/?daddr=' + currentLatitude + ',' + currentLongitude)
+        }
+        else {
+          Linking.openURL('https://www.google.com/maps/place/' + currentLatitude + ',' + currentLongitude)
+        }
+      }} text="Haritada Gör" width='80%' />
+      <BottomBar disable={locationStatus == "Konum Algılanıyor..."} type='ONE' onPress={() => navigation.navigate(SCREENS.ContactScreen)} />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  boldText: {
-    fontSize: 25,
-    color: 'red',
-    marginVertical: 16,
-    textAlign: 'center'
-  },
-});
 
 export default LocationScreen;
