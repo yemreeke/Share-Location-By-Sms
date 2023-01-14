@@ -5,11 +5,12 @@ import BottomBar from '../components/BottomBar';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { SCREENS } from '../navigation/navigation';
+import openMap from "react-native-open-maps";
 
 const LocationScreen = () => {
   const navigation = useNavigation();
-  const [currentLongitude, setCurrentLongitude] = useState("");
-  const [currentLatitude, setCurrentLatitude] = useState("");
+  const [currentLongitude, setCurrentLongitude] = useState(0);
+  const [currentLatitude, setCurrentLatitude] = useState(0);
   const [locationStatus, setLocationStatus] = useState("");
 
   useEffect(() => {
@@ -68,8 +69,8 @@ const LocationScreen = () => {
       (position) => {
         setLocationStatus('Konum Başarıyla Algılanmıştır');
         console.log(position);
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        const currentLatitude = JSON.stringify(position.coords.latitude);
+        const currentLongitude = position.coords.longitude;
+        const currentLatitude = position.coords.latitude;
         setCurrentLongitude(currentLongitude);
         setCurrentLatitude(currentLatitude);
       },
@@ -99,12 +100,9 @@ const LocationScreen = () => {
       </Text>
       <CustomButton onPress={getOneTimeLocation} text="Yenile" width='40%' />
       <CustomButton disable={locationStatus == "Konum Algılanıyor..."} onPress={() => {
-        if (Platform.OS == "ios") {
-          Linking.openURL('https://maps.apple.com/?daddr=' + currentLatitude + ',' + currentLongitude)
-        }
-        else {
-          Linking.openURL('https://www.google.com/maps/place/' + currentLatitude + ',' + currentLongitude)
-        }
+        openMap({
+          latitude: currentLatitude, longitude: currentLongitude
+        })
       }} text="Haritada Gör" width='80%' />
       <BottomBar disable={locationStatus == "Konum Algılanıyor..."} type='ONE' onPress={() => navigation.navigate(SCREENS.ContactScreen)} />
     </SafeAreaView>
