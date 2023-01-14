@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, Image, PermissionsAndroid, Platform, Linking } from 'react-native';
+import { SafeAreaView, Text, Image, PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import BottomBar from '../components/BottomBar';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { SCREENS } from '../navigation/navigation';
-import openMap from "react-native-open-maps";
+import openMap, { createMapLink } from "react-native-open-maps";
 
 const LocationScreen = () => {
   const navigation = useNavigation();
   const [currentLongitude, setCurrentLongitude] = useState(0);
   const [currentLatitude, setCurrentLatitude] = useState(0);
   const [locationStatus, setLocationStatus] = useState("");
-
+  const [mapsUrl, setMapsUrl] = useState("");
   useEffect(() => {
     const requestLocationPermission = async () => {
       if (Platform.OS === 'ios') {
@@ -49,10 +49,13 @@ const LocationScreen = () => {
     Geolocation.getCurrentPosition(
       (position) => {
         setLocationStatus('Konum Başarıyla Algılanmıştır');
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        const currentLatitude = JSON.stringify(position.coords.latitude);
+        const currentLongitude = position.coords.longitude;
+        const currentLatitude = position.coords.latitude;
         setCurrentLongitude(currentLongitude);
         setCurrentLatitude(currentLatitude);
+        const provider = Platform.OS == "ios" ? "apple" : "google";
+        const url = createMapLink({ query: currentLatitude + "," + currentLongitude, provider: provider },)
+        setMapsUrl(url)
       },
       (error) => {
         setLocationStatus(error.message);
@@ -83,7 +86,6 @@ const LocationScreen = () => {
       },
     );
   };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white", alignItems: "center" }}>
       <Image
@@ -99,12 +101,14 @@ const LocationScreen = () => {
         {locationStatus}
       </Text>
       <CustomButton onPress={getOneTimeLocation} text="Yenile" width='40%' />
-      <CustomButton disable={locationStatus == "Konum Algılanıyor..."} onPress={() => {
-        openMap({
-          latitude: currentLatitude, longitude: currentLongitude
-        })
-      }} text="Haritada Gör" width='80%' />
-      <BottomBar disable={locationStatus == "Konum Algılanıyor..."} type='ONE' onPress={() => navigation.navigate(SCREENS.ContactScreen)} />
+      <CustomButton
+        disable={locationStatus == "Konum Algılanıyor..."}
+        onPress={() => {
+          openMap({ query: currentLatitude + "," + currentLongitude })
+        }}
+        text="Haritada Gör" width='80%'
+      />
+      <BottomBar disable={locationStatus == "Konum Algılanıyor..."} text="İlerle" onPress={() => navigation.navigate(SCREENS.ContactScreen, { url: mapsUrl })} />
     </SafeAreaView>
   );
 };
