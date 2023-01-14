@@ -19,7 +19,7 @@ const HomeScreen = () => {
           <Text style={{ marginTop: 10, fontSize: 26, color: "#000" }}>1171602024</Text>
         </View>
       </ScrollView>
-      <BottomBar type="ONE"
+      <BottomBar text="İlerle"
         onPress={() => {
           navigation.navigate(SCREENS.LocationScreen);
         }}
