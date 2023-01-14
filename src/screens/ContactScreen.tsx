@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, PermissionsAndroid, Platform, StyleSheet, Text, View } from "react-native";
+import { Alert, PermissionsAndroid, Platform, Text, View } from "react-native";
 import { Contact, selectContact, } from "react-native-select-contact";
 import BottomBar from "../components/BottomBar";
 import CustomButton from "../components/CustomButton";
@@ -10,25 +10,23 @@ interface Props {
 }
 const ContactScreen = (props: Props) => {
   const [mapUrl, setMapsUrl] = useState("")
+  const [selected, setSelected] = useState<Contact>();
+
   useEffect(() => {
     if (props.route.params.url) {
       setMapsUrl(props.route.params.url)
     }
   }, [])
-  const [selected, setSelected] = useState<Contact>();
+
   const selectPerson = async () => {
     if (await ContactPermission()) {
       const selectedPerson = await selectContact();
       if (selectedPerson) {
         setSelected(selectedPerson);
-        const name = selectedPerson?.name;
-        const phone = selectedPerson?.phones[0]?.number;
-        console.log("Contcact:", selectedPerson);
-        console.log('Name:', name);
-        console.log('Phone:', phone);
       }
     }
   };
+
   const ContactPermission = async () => {
     if (Platform.OS === 'android') {
       const request = await PermissionsAndroid.request(
@@ -45,6 +43,7 @@ const ContactScreen = (props: Props) => {
     }
     return true;
   };
+
   const smsGonder = () => {
     if (selected) {
       const number = selected.phones[0].number.toString();
@@ -56,20 +55,20 @@ const ContactScreen = (props: Props) => {
         },
         (completed, cancelled, error) => {
           if (completed) {
-            Alert.alert('SMS Başarıyla gönderilmiştir.');
+            Alert.alert('SMS başarıyla gönderilmiştir.');
           } else if (cancelled) {
-            Alert.alert('SMS Gönderilmekten Vazgeçilmiştir');
+            Alert.alert('SMS gönderilmekten vazgeçilmiştir');
           } else if (error) {
-            Alert.alert('Some error occured' + error);
+            Alert.alert('Sms gönderme hatası oluştu');
           }
         },
       );
     }
   }
+
   return (
     <View style={{ flex: 1, alignItems: "center", backgroundColor: "white", paddingTop: 30, }}>
-      <Text style={styles.header} >Sms Gönderilecek Kişiyi Seçiniz</Text>
-
+      <Text style={{ color: "black", fontSize: 22, }} >Sms Gönderilecek Kişiyi Seçiniz</Text>
       <CustomButton text="Kişi Seç" width="50%" onPress={selectPerson} />
       <View style={{ width: "100%", marginTop: 30, alignItems: "center" }}>
         {
@@ -87,21 +86,4 @@ const ContactScreen = (props: Props) => {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  title: {
-    color: "black",
-    fontSize: 25,
-    marginBottom: 10,
-  },
-  header: {
-    color: "black",
-    fontSize: 22,
-  },
-  text: {
-    color: "black",
-    fontSize: 18,
-  }
-})
-
 export default ContactScreen;
