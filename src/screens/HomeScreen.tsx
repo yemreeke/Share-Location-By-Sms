@@ -15,8 +15,6 @@ const HomeScreen = () => {
           <Text style={{ marginTop: 10, fontSize: 26, color: "#000" }}>Bilgisayar Mühendisliği</Text>
           <Text style={{ marginTop: 10, fontSize: 24, color: "#000" }}>Mobil Uygulama Dersi</Text>
           <Text style={{ marginTop: 10, fontSize: 18, color: "#000" }}>Konum Öğrenip Sms İle Paylaşma Uygulaması</Text>
-          <Text style={{ marginTop: 20, fontSize: 26, color: "#000" }}>DOĞUKAN SONGÜR</Text>
-          <Text style={{ marginTop: 10, fontSize: 26, color: "#000" }}>1171602024</Text>
         </View>
       </ScrollView>
       <BottomBar text="İlerle"
